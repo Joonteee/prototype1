@@ -1,21 +1,51 @@
 import { Component } from '@angular/core';
 import { PopoverController, ViewController, NavController } from 'ionic-angular';
 import { VenueInfo } from '../venueInfo/venueInfo';
-import { GlobenPage} from '../globen/globen';
+import { SelectedVenue} from '../selectedVenue/selectedVenue';
+import { ApiProvider } from '../../providers/api/api';
 
 @Component({
-  templateUrl: 'venue.html'
+  templateUrl: 'venueList.html'
 })
 
-export class VenuePage {
+export class VenueList {
   venues;
+  splash = true;
 
-  constructor(public popoverCtrl: PopoverController, public navCtrl: NavController ) {
-    this.initializeVenues();
+  //tabBarElement: any;
+
+  constructor(public popoverCtrl: PopoverController, public navCtrl: NavController, public provider: ApiProvider ) {
+    /*this.initializeVenues();*/
+    this.ionLoadVenues();
+  //  this.tabBarElement = document.querySelector('.tabbar');
 
   }
+  goToPage(venueTitle: string){
+    console.log(venueTitle);
+    this.navCtrl.push(SelectedVenue, {
+klickedVenue: venueTitle,
 
-  initializeVenues() {  // Initierar lista med olika arenor
+    })
+  }
+
+  ionLoadVenues() { // Kommer att hämta olika arenor info från API
+    this.provider.obtainVenues()
+    .subscribe(
+      (data)=> {this.venues = data;},
+      (error)=> {console.log(error);}
+    )
+  }
+
+  ionViewDidLoad(){
+    //  this.tabBarElement.style.display = 'none';
+      setTimeout(() => {
+        this.splash = false;
+  //      this.tabBarElement.style.display = 'flex';
+
+      }, 4000);
+    }
+
+  /* initializeVenues() {  // Initierar lista med olika arenor
     this.venues = [
       {name: 'Ericsson Globe', id: 1},
       {name: 'Hovet', id: 2},
@@ -27,8 +57,9 @@ export class VenuePage {
       {name: 'Cirkus', id: 8}
     ];
   }
+  */
 
-  getVenues(ev) {
+/*  getVenues(ev) {
     this.initializeVenues();  // Återställer lista till alla arenor
 
     let val = ev.target.value;  // Sätter 'val' till värdet av 'ev'
@@ -39,7 +70,7 @@ export class VenuePage {
       })
     }
   }
-
+*/
   openInfo(myEvent) {   // Skapar en PopOver-sida när man trycker på "i"
     let popover = this.popoverCtrl.create(VenueInfo);
     popover.present({
@@ -47,7 +78,5 @@ export class VenuePage {
     });            // där man klickar.
   }
 
-  goToPage():void
-  {  this.navCtrl.push(GlobenPage);}
 
 }
